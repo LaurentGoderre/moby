@@ -54,6 +54,25 @@ func TestValidateMount(t *testing.T) {
 			input:    mount.Mount{Type: mount.TypeBind, Source: testSourcePath, Target: testDestinationPath},
 			expected: errBindSourceDoesNotExist(testSourcePath),
 		},
+		{
+			input:    mount.Mount{Type: mount.TypeImage},
+			expected: errMissingField("Target"),
+		},
+		{
+			input:    mount.Mount{Type: mount.TypeImage, Target: testDestinationPath},
+			expected: errMissingField("Source"),
+		},
+		{
+			input: mount.Mount{Type: mount.TypeImage, Target: testDestinationPath, Source: "hello"},
+		},
+		{
+			input:    mount.Mount{Type: mount.TypeImage, Target: testDestinationPath, Source: "hello", BindOptions: &mount.BindOptions{}},
+			expected: errExtraField("BindOptions"),
+		},
+		{
+			input:    mount.Mount{Type: mount.TypeImage, Target: testDestinationPath, Source: "hello", VolumeOptions: &mount.VolumeOptions{}},
+			expected: errExtraField("VolumeOptions"),
+		},
 	}
 	for _, tc := range tests {
 		t.Run("", func(t *testing.T) {
