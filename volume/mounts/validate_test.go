@@ -32,6 +32,14 @@ func TestValidateMount(t *testing.T) {
 			input: mount.Mount{Type: mount.TypeVolume, Target: testDestinationPath, Source: "hello", VolumeOptions: &mount.VolumeOptions{Subpath: "world"}},
 		},
 		{
+			input:    mount.Mount{Type: mount.TypeVolume, Target: testDestinationPath, Source: "hello", BindOptions: &mount.BindOptions{}},
+			expected: errExtraField("BindOptions"),
+		},
+		{
+			input:    mount.Mount{Type: mount.TypeVolume, Target: testDestinationPath, Source: "hello", ImageOptions: &mount.ImageOptions{}},
+			expected: errExtraField("ImageOptions"),
+		},
+		{
 			input:    mount.Mount{Type: mount.TypeBind},
 			expected: errMissingField("Target"),
 		},
@@ -42,6 +50,10 @@ func TestValidateMount(t *testing.T) {
 		{
 			input:    mount.Mount{Type: mount.TypeBind, Target: testDestinationPath, Source: testSourcePath, VolumeOptions: &mount.VolumeOptions{}},
 			expected: errExtraField("VolumeOptions"),
+		},
+		{
+			input:    mount.Mount{Type: mount.TypeBind, Target: testDestinationPath, Source: testSourcePath, ImageOptions: &mount.ImageOptions{}},
+			expected: errExtraField("ImageOptions"),
 		},
 		{
 			input: mount.Mount{Type: mount.TypeBind, Source: testDir, Target: testDestinationPath},
@@ -64,6 +76,9 @@ func TestValidateMount(t *testing.T) {
 		},
 		{
 			input: mount.Mount{Type: mount.TypeImage, Target: testDestinationPath, Source: "hello"},
+		},
+		{
+			input: mount.Mount{Type: mount.TypeImage, Target: testDestinationPath, Source: "hello", ImageOptions: &mount.ImageOptions{Subpath: "world"}},
 		},
 		{
 			input:    mount.Mount{Type: mount.TypeImage, Target: testDestinationPath, Source: "hello", BindOptions: &mount.BindOptions{}},
