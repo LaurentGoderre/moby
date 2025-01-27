@@ -656,13 +656,6 @@ func testLiveRestoreVolumeReferences(t *testing.T) {
 		ctx := testutil.StartSpan(ctx, t)
 
 		mountedImage := "hello-world:frozen"
-
-		cfg := filepath.Join(d.RootDir(), "daemon.json")
-		err := os.WriteFile(cfg, []byte(`{"features": { "image-mount": true }}`), 0o644)
-		assert.NilError(t, err)
-
-		d.Restart(t, "--live-restore", "--iptables=false", "--ip6tables=false", "--config-file", cfg)
-
 		d.LoadImage(ctx, t, mountedImage)
 
 		m := mount.Mount{
@@ -688,14 +681,14 @@ func testLiveRestoreVolumeReferences(t *testing.T) {
 
 		poll.WaitOn(t, waitFn)
 
-		d.Restart(t, "--live-restore", "--iptables=false", "--ip6tables=false", "--config-file", cfg)
+		d.Restart(t, "--live-restore", "--iptables=false", "--ip6tables=false")
 
 		t.Run("image still mounted", func(t *testing.T) {
 			skip.If(t, testEnv.IsRootless(), "restarted rootless daemon has a new mount namespace and it won't have the previous mounts")
 			poll.WaitOn(t, waitFn)
 		})
 
-		_, err = c.ImageRemove(ctx, mountedImage, image.RemoveOptions{})
+		_, err := c.ImageRemove(ctx, mountedImage, image.RemoveOptions{})
 		assert.ErrorContains(t, err, fmt.Sprintf("container %s is using its referenced image", cID[:12]))
 
 		// Remove that container which should free the references in the volume
