@@ -249,9 +249,6 @@ func (daemon *Daemon) registerMountPoints(container *container.Container, hostCo
 		}
 
 		if mp.Type == mounttypes.TypeImage {
-			if !daemon.Config().CommonConfig.Features["image-mount"] {
-				return fmt.Errorf("Feature 'image-mount' is not enabled")
-			}
 			img, err := daemon.imageService.GetImage(ctx, mp.Source, backend.GetImageOpts{})
 			if err != nil {
 				return err
